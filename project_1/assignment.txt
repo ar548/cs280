@@ -1,0 +1,51 @@
+Sometimes when a memo is boring, a programmer with some free time is tempted to make the
+memo more entertaining. This assignment asks you to write a C++ program
+"funnymemo" to make a boring memo funny byinserting adjectives into the text. The
+input to your program should be copied to the output, with adjectives
+inserted between all consecutive occurrences of an article and a noun.
+
+For our purposes in this assignment: A "word" is a sequence of characters
+beginning with a letter and followed by zero or more letters or digits. An
+"article" is one of the following words: a, an, the. Note that words may have
+capital letters anywhere in the word. This implies that all of the following are
+"articles": a, A, an, An, aN, the, The, tHe, thE, THe, tHE, THE. For our purposes
+here, the word after an article is a noun, by definition. When an adjective is inserted
+between an article and a noun, the article should be inserted according to the following
+rules 
+
+1. If the noun that follows the article begins with a lowercase letter, then the adjective
+should be in all lowercase letters.
+2. If the noun that follows the article is all capital letters, then the adjective should
+be all capital letters.
+3. Otherwise, the adjective should begin with a capital letter and have all other letters
+be lowercase.
+4. If the noun begins with a vowel (a, e, i, o or u), and the adjective does not, and the
+article is "an", then the article should output as "a".
+5. If the adjective begins with a vowel and the article is "a", then the article
+should output as "an".
+
+Here are some examples, where the adjectives "silly" and "awkward" are
+added:
+BEFORE funnymemo AFTER funnymemo
+
+A day -> A silly day
+A day -> An awkward day
+A Walk -> A Silly Walk
+A Walk -> An Awkward Walk
+the fISH -> the silly fISH
+the fISH -> the awkward fISH
+an ANACONDA -> a SILLY ANACONDA
+an ANACONDA -> an AWKWARD ANACONDA
+
+Your program should accept two command line arguments. The first argument is the adjective
+to be inserted into the memo. The second argument is the name of a text file containing
+the input text for the memo. Your program should read the file named in the second
+argument as input and generate its output to standard out.
+Whenever the program finds an article followed by a word, it should insert the adjective
+provided in the first command line argument, according to the rules given above. The
+program finishes when the end of the input file is reached.
+
+Remember that your program needs to check for errors and react appropriately. What happens
+if the proper number of command line arguments are not provided? What if the text file
+cannot be opened? What happens if there is an article on one line and the noun on the next
+line? What should happen in the case when the last word in the input file is an article?
