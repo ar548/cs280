@@ -11,6 +11,8 @@ int main (){
 	string yourstring = mystring;
 
 	cout << mystring.length() << endl;
-	
+	cout << mystring.at(3) << endl;
+	cout << mystring[] << endl;
+
     return 0;
 }
