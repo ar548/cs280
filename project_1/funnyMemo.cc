@@ -17,16 +17,39 @@ int main (int argc, char *argv[]) {
 	}
 
 	string adj = argv[1];
-	infile.open(argv[2]);
-	if(infile.is_open()){
-		br = &infile;
-		cout << "it worked" << endl;
+	string vowels = "AaEeIiOoUu";
+	string an = "a";
+	for(int i = 0; i < 10; i++){
+		if(adj.at(0) == vowels.at(i)){
+			an = "an";
+		}
 	}
-	else {
+	infile.open(argv[2]);
+	if(!infile.is_open()){
 		cerr << "Error: Could not open" << string(argv[2]) << endl;
 		return 1;
 	}
-
+	
+	//in ascii 48-57 are numbers, 65-90 are capital, 97-122 are lowercase
+	string line;
+	char ch;
+	string word;
+	do{
+		getline(*br, line);
+		
+		for(int i = 0; i < line.length(); i++ ){
+			ch = line.at(i);
+			if( (ch>=48 && ch<=57) || (ch>=65 && ch<=90) || (ch>=97 && ch<=122) ){
+				word = word + ch;
+			}
+			else{
+				cout << word << ch;
+				word = "";
+			}
+		}
+		cout << "\n";
+	
+	}while(br->good());
 
     return 0;
 }
