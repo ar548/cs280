@@ -1,7 +1,7 @@
 #include <iostream>
+#include <cctype>
 #include <cstdlib>
 #include <string>
-#include <cctype>
 #include <fstream>
 
 using namespace std;
@@ -43,7 +43,13 @@ int main (int argc, char *argv[]) {
 				word = word + ch;
 			}
 			else{
-				cout << word << ch;
+				//cout << word << ch;
+				if ( word == "the" || word == "The" || word == "tHe" || word == "THe" || word == "thE" || word == "ThE" || word == "tHE" || word == "THE" ){
+					cerr << " the ";
+				}
+				else{
+					cout << word;
+				}
 				word = "";
 			}
 		}
