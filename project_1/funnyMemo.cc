@@ -1,16 +1,32 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include <cctype>
+#include <fstream>
 
 using namespace std;
 
 int main (int argc, char *argv[]) {
-	//argc is the number of cmd arguments argv is an array of the arguments
-	//where argv[0] is the first going from left to right
-	cout << "There were " << argc << " arguments on the command line" << endl;
-	for( int i=0; i<argc+1; i++ ) {
-		cout << i << ":" << argv[i] << ":" << endl;
+	istream *br;
+	ifstream infile;
+
+	if(argc != 3){
+		cerr << "This program takes exeactly 2 arguments:\n
+		The first is the ajdective to be added, the second is the file name.\n";
+		return 0;
 	}
-	
+
+	string adj = argv[1];
+	infile.open(argv[2]);
+	if(infile.is_open()){
+		br = &infile;
+		cout << "it worked" << endl;
+	}
+	else {
+		usage(argv[0], "Cannot open " + string(argv[2]));
+		return 1;
+	}
+
+
     return 0;
 }
