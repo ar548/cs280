@@ -11,8 +11,8 @@ int main (int argc, char *argv[]) {
 	ifstream infile;
 
 	if(argc != 3){
-		cerr << "This program takes exeactly 2 arguments:\n
-		The first is the ajdective to be added, the second is the file name.\n";
+		cerr << "This program takes exeactly 2 arguments:\n";
+		cerr << "The first is the ajdective to be added, the second is the file name.\n";
 		return 0;
 	}
 
@@ -23,7 +23,7 @@ int main (int argc, char *argv[]) {
 		cout << "it worked" << endl;
 	}
 	else {
-		usage(argv[0], "Cannot open " + string(argv[2]));
+		cerr << "Error: Could not open" << string(argv[2]) << endl;
 		return 1;
 	}
 
