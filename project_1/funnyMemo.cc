@@ -6,6 +6,9 @@
 
 using namespace std;
 
+string toUppercase(string);
+string toLowercase(string);
+
 int main (int argc, char *argv[]) {
 	istream *br;
 	ifstream infile;
@@ -17,10 +20,12 @@ int main (int argc, char *argv[]) {
 	}
 	
 	string adj = argv[1];
+	adj = toLowercase(adj);
+	adj[0] = toupper(adj[0]);//sets the correct case
+	
 	infile.open(argv[2]);
 	if(infile.is_open()){
 		br = &infile;
-		cout << "it worked" << endl;
 	}
 	else{
 		cerr << "Error: Could not open " << string(argv[2]);
@@ -28,10 +33,10 @@ int main (int argc, char *argv[]) {
 	}
 
 	string vowels = "AaEeIiOoUu";
-	string an = "a ";
+	string an = "a";
 	for(int i = 0; i < 10; i++){
 		if(adj.at(0) == vowels.at(i)){
-			an = "an ";
+			an = "an";
 		}
 	}
 
@@ -41,7 +46,7 @@ int main (int argc, char *argv[]) {
 	string line;
 	char ch;
 	string word;
-	bool wasArticle = false;//not used yet but is for later
+	bool wasArticle = false;
 	
 	do{
 		getline(*br, line);
@@ -53,12 +58,32 @@ int main (int argc, char *argv[]) {
 			}
 			else{
 				//cout << word << ch;
-				if ( word == "the" || word == "The" || word == "tHe" || word == "THe" || word == "thE" || word == "ThE" || word == "tHE" || word == "THE" ){
-					cout << "the ";
-					cout << adj << " " << ch;
+				if(wasArticle){
+					if(word == toUppercase(word)){
+						cout << toUppercase(adj);
+					}
+					else if(word == toLowercase(word)){
+						cout << toLowercase(adj);
+					}
+					else{
+						cout << word;
+					}
+					cout << " " << word << ch;
+					wasArticle = false;
+				}
+				else if ( word == "the" || word == "The" || word == "tHe" || word == "THe" || word == "thE" || word == "ThE" || word == "tHE" || word == "THE" ){
+					cout << word << ch;
+					wasArticle = true;
+						
+					
 				}
 				else if(word == "a" || word == "A" || word == "an" || word == "An" || word == "aN" || word == "AN"){
-					cout << an << adj << " ";
+					if(word.at(0) == 'A'){
+						an[0] = toupper(an[0]);
+					}
+					cout << an << ch;
+					wasArticle = true;
+
 				}
 				else{
 					cout << word << ch;
@@ -71,4 +96,20 @@ int main (int argc, char *argv[]) {
 	}while(br->good());
 
     return 0;
+}
+
+string toUppercase(string s){
+	string str = "";
+	for(int i = 0; i < s.length(); i++){
+		str += toupper(s[i]);
+	}
+	return str;
+}
+
+string toLowercase(string s){
+	string str;
+	for(int i = 0; i < s.length(); i++){
+		str += tolower(s[i]);
+	}
+	return str;
 }
