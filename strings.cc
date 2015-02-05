@@ -12,7 +12,7 @@ int main (){
 
 	cout << mystring.length() << endl;
 	cout << mystring.at(3) << endl;
-	cout << mystring[] << endl;
+	cout << mystring[3] << endl;
 
     return 0;
 }

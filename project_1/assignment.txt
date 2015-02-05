@@ -1,3 +1,4 @@
+
 Sometimes when a memo is boring, a programmer with some free time is tempted to make the
 memo more entertaining. This assignment asks you to write a C++ program
 "funnymemo" to make a boring memo funny byinserting adjectives into the text. The
