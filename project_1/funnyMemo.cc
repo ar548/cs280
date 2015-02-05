@@ -21,8 +21,6 @@ int main (int argc, char *argv[]) {
 	
 	string adj = argv[1];
 	adj = toLowercase(adj);
-	adj[0] = toupper(adj[0]);//sets the correct case
-	
 	infile.open(argv[2]);
 	if(infile.is_open()){
 		br = &infile;
@@ -62,8 +60,13 @@ int main (int argc, char *argv[]) {
 					if(word == toUppercase(word)){
 						cout << toUppercase(adj);
 					}
-					else if(word == toLowercase(word)){
+					else if (word == toLowercase(word)){
 						cout << toLowercase(adj);
+					}
+					else if( word.at(0) == toupper(word.at(0)) ){
+						adj[0] = toupper(adj[0]);
+						cout << adj;
+						toLowercase(adj);
 					}
 					else{
 						cout << adj;
@@ -89,16 +92,14 @@ int main (int argc, char *argv[]) {
 				word = "";
 			}
 		}
-		if ( word == "the" || word == "The" || word == "tHe" || word == "THe" || word == "thE" || word == "ThE" || word == "tHE" || word == "THE" ){
-			cout << word << "\n";
-			wasArticle = true;
+		if ( (word == "the" || word == "The" || word == "tHe" || word == "THe" || word == "thE" || word == "ThE" || word == "tHE" || word == "THE" ) && br->good() ){
+			cout << word << " " << adj << "\n";
 		}
-		else if(word == "a" || word == "A" || word == "an" || word == "An" || word == "aN" || word == "AN"){
+		else if( (word == "a" || word == "A" || word == "an" || word == "An" || word == "aN" || word == "AN") && br->good() ){
 			if(word.at(0) == 'A'){
 				an[0] = toupper(an[0]);
 			}
-			cout << an << "\n";
-			wasArticle = true;
+			cout << an << " " << adj << "\n";
 		}
 		else{
 			cout << word << "\n";
