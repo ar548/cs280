@@ -45,7 +45,7 @@ int main (int argc, char *argv[]) {
 	char ch;
 	string word;
 	bool wasArticle = false;
-	
+	bool articleAtEnd = false;
 	do{
 		getline(*br, line);
 		word = "";
@@ -56,7 +56,7 @@ int main (int argc, char *argv[]) {
 			}
 			else{
 				//cout << word << ch;
-				if(wasArticle){
+				if(wasArticle && !articleAtEnd){
 					if(word == toUppercase(word)){
 						cout << toUppercase(adj);
 					}
@@ -73,10 +73,12 @@ int main (int argc, char *argv[]) {
 					}
 					cout << " " << word << ch;
 					wasArticle = false;
+					articleAtEnd = false;
 				}
 				else if ( word == "the" || word == "The" || word == "tHe" || word == "THe" || word == "thE" || word == "ThE" || word == "tHE" || word == "THE" ){
 					cout << word << ch;
 					wasArticle = true;
+					articleAtEnd = false;
 				}
 				else if(word == "a" || word == "A" || word == "an" || word == "An" || word == "aN" || word == "AN"){
 					if(word.at(0) == 'A'){
@@ -84,7 +86,7 @@ int main (int argc, char *argv[]) {
 					}
 					cout << an << ch;
 					wasArticle = true;
-
+					articleAtEnd = false;
 				}
 				else{
 					cout << word << ch;
@@ -94,12 +96,14 @@ int main (int argc, char *argv[]) {
 		}
 		if ( (word == "the" || word == "The" || word == "tHe" || word == "THe" || word == "thE" || word == "ThE" || word == "tHE" || word == "THE" ) && br->good() ){
 			cout << word << " " << adj << "\n";
+			articleAtEnd = true;
 		}
 		else if( (word == "a" || word == "A" || word == "an" || word == "An" || word == "aN" || word == "AN") && br->good() ){
 			if(word.at(0) == 'A'){
 				an[0] = toupper(an[0]);
 			}
 			cout << an << " " << adj << "\n";
+			articleAtEnd = true;
 		}
 		else{
 			cout << word << "\n";
