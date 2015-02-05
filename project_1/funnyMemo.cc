@@ -66,7 +66,7 @@ int main (int argc, char *argv[]) {
 						cout << toLowercase(adj);
 					}
 					else{
-						cout << word;
+						cout << adj;
 					}
 					cout << " " << word << ch;
 					wasArticle = false;
@@ -74,8 +74,6 @@ int main (int argc, char *argv[]) {
 				else if ( word == "the" || word == "The" || word == "tHe" || word == "THe" || word == "thE" || word == "ThE" || word == "tHE" || word == "THE" ){
 					cout << word << ch;
 					wasArticle = true;
-						
-					
 				}
 				else if(word == "a" || word == "A" || word == "an" || word == "An" || word == "aN" || word == "AN"){
 					if(word.at(0) == 'A'){
@@ -91,10 +89,21 @@ int main (int argc, char *argv[]) {
 				word = "";
 			}
 		}
-		cout << word << "\n";
-	
+		if ( word == "the" || word == "The" || word == "tHe" || word == "THe" || word == "thE" || word == "ThE" || word == "tHE" || word == "THE" ){
+			cout << word << "\n";
+			wasArticle = true;
+		}
+		else if(word == "a" || word == "A" || word == "an" || word == "An" || word == "aN" || word == "AN"){
+			if(word.at(0) == 'A'){
+				an[0] = toupper(an[0]);
+			}
+			cout << an << "\n";
+			wasArticle = true;
+		}
+		else{
+			cout << word << "\n";
+		}
 	}while(br->good());
-
     return 0;
 }
 
