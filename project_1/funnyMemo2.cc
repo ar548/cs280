@@ -52,7 +52,6 @@ int main (int argc, char *argv[]) {
 				word += ch;
 			}
 			else{
-				//cout << word << ch;
 				if( wasArticle ){
 					if(word == toUppercase(word) && word != ""){
 						cout << toUppercase(adj);
@@ -104,6 +103,7 @@ int main (int argc, char *argv[]) {
 			an = toLowercase(an);
 		}
 		else{
+			didArticle = false;
 			cout << word << '\n';
 		}
 	}
