@@ -10,6 +10,8 @@ string toUppercase(string);
 string toLowercase(string);
 
 int main (int argc, char *argv[]) {
+
+	//makes sure that there are the right number or args
 	if(argc != 3){
 		cerr << "This program takes exeactly 2 arguments:\n";
 		cerr << "The first is the ajdective to be added, the second is the file name.\n";
