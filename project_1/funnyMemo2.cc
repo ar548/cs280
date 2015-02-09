@@ -20,7 +20,9 @@ int main (int argc, char *argv[]) {
 	ifstream infile;
 
 	string adj = argv[1];
-	adj = toLowercase(adj);
+	adj = toLowercase(adj);//sets the correct format no matter what the input is
+
+	//opens the file then makes sure that it is actually open
 	infile.open(argv[2]);
 	if(infile.is_open()){
 		br = &infile;
@@ -29,6 +31,8 @@ int main (int argc, char *argv[]) {
 		cerr << "Error: Could not open " << string(argv[2]);
 		return 1;
 	}
+
+	//gets the correct version of a/an for the given adj
 	string vowels = "AaEeIiOoUu";
 	string an = "a";
 	for(int i = 0; i < 10; i++){
@@ -37,6 +41,7 @@ int main (int argc, char *argv[]) {
 		}
 	}
 
+	//basic declaration of needed variables
 	string line;
 	char ch;
 	string word;
@@ -44,15 +49,19 @@ int main (int argc, char *argv[]) {
 	bool didArticle = false;
 
 	while(br->good()){
-		getline(*br, line);
+		getline(*br, line);//gets the individual line from the file
 		word = "";
+		//increments through each character in the line
 		for(int i = 0; i < line.length(); i++){
 			ch =  line.at(i);
+			//is the character alphanumeric: if so store it to a string otherwise print it
 			if( (ch>=48 && ch<=57) || (ch>=65 && ch<=90) || (ch>=97 && ch<=122) ){
 				word += ch;
 			}
 			else{
+				//was the previous word an article
 				if( wasArticle ){
+					//matches the three case cases
 					if(word == toUppercase(word) && word != ""){
 						cout << toUppercase(adj);
 					}
@@ -69,20 +78,24 @@ int main (int argc, char *argv[]) {
 					}
 					cout << ' ' + word + ch;
 					wasArticle = false;
-					didArticle = true;
+					didArticle = true;//used to handle the "a a day" case
 				}
+				//checks if the word is the. ignored if the previous word was an article making this one a noun
 				else if( toLowercase(word) == "the" && !didArticle ){
 					wasArticle = true;
 					cout << word + ch;
 				}
+				//checks if the word is a. ignored if the previous word was an article making this one a noun
 				else if( (toLowercase(word) == "a" || toLowercase(word) == "an") && !didArticle ){
 					wasArticle = true;
+					//gets the correct capitalization for the word A / An
 					if(word.at(0) == 'A'){
 						an[0] = toupper(an[0]);
 					}
 					cout << an + ch;
 					an = toLowercase(an);
 				}
+				//failing all the other print out the word
 				else{
 					cout << word << ch;
 					didArticle = false;
@@ -90,6 +103,8 @@ int main (int argc, char *argv[]) {
 				word = "";
 			}
 		}
+		//handles the word at the end of the line.  this was done bacause i could not read the whole file in character by
+		//character
 		if(toLowercase(word) == "the" && !didArticle ){
 			wasArticle = true;
 			cout << word + '\n';
@@ -111,6 +126,7 @@ int main (int argc, char *argv[]) {
 return 0;
 }
 
+//simple comversion helper functions: self explanitory
 string toUppercase(string s){
 	string str = "";
 	for(int i = 0; i < s.length(); i++){
