@@ -1,6 +1,7 @@
 #include "p2lex.h"
 #include<iostream>
 #include<string>
+#include<fstream>
 
 using namespace std;
 
@@ -8,15 +9,6 @@ int main(int argc, char* argv[]){
 	
 	istream *br;
 	ifstream infile;
-
-	infile.open(argv[1]);
-	if( infile.is_open() ){
-		br = &infile;
-	}
-	else{
-		cerr << "Error: Could not open " << srting(argv[1]) << endl;
-		return 1;
-	}
 	
 	if(argc == 2){
 		//get tokens from file
@@ -25,13 +17,14 @@ int main(int argc, char* argv[]){
 			br = &infile;
 		}
 		else{
-			cerr << "Error: Could not open " << srting(argv[1]) << endl;
+			cerr << "Error: Could not open " << string(argv[1]) << endl;
                 	return 1;
 	        }
 	}
 	else if(argc == 1){
 		//get tokens from cmdln input
 		string line;
+		bool done = false;
 		while( cin.good() && !done ){
 			cin >> line;
 			if(line == "done"){
@@ -43,7 +36,7 @@ int main(int argc, char* argv[]){
 	}
 	else{
 		cerr << "Error: Too many args" << endl;
-		cerr << "This program takes either no args and reads user input \nor\n";
+		cerr << "This program takes either no args and reads user input or\n";
 		cerr << "It can take 1 arg which is the name of a file it will read" << endl;
 		return 1;
 	}
