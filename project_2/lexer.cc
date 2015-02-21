@@ -37,16 +37,36 @@ int main(int argc, char* argv[]){
 	map<Token, int> counters;
 	Token t;
 	while( (t = getToken(br, lexeme)) != DONE){
-		cout << lexeme;
+		cout << lexeme << endl;
 		counters[t]++;
-		lexeme = "";
 	}
 	
 	map<Token, int>::iterator it;
 	for(it = counters.begin(); it != counters.end(); it++){
 		cout << it->first << ":" << it->second << endl;
 	}
-	//Token t = getToken(br, lexeme);
 
 return 0;
+}
+
+Token getToken(istream *br, string &lexeme){
+	Token T;
+	lexeme = "";
+	char ch;
+	if(br->good()){
+		while(br->good()){
+			ch = br->get();
+			if( (ch >= 'A'&& ch <= 'Z') || (ch >= 'a' && ch <= 'z') ){
+				lexeme += ch;
+			}
+			else{
+				T = ID;
+				break;
+			}
+		}
+	}
+	else{
+		T = DONE;
+	}
+	return T;
 }
