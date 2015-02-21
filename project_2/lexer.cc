@@ -2,6 +2,7 @@
 #include<iostream>
 #include<string>
 #include<fstream>
+#include<map>
 
 using namespace std;
 
@@ -9,7 +10,7 @@ int main(int argc, char* argv[]){
 	
 	istream *br;
 	ifstream infile;
-	string lexeme = "";
+	string lexeme;
 
 	if(argc == 2){
 		//get tokens from file
@@ -33,7 +34,19 @@ int main(int argc, char* argv[]){
 		return 1;
 	}
 	
-	Token t = getToken(br, lexeme);
+	map<Token, int> counters;
+	Token t;
+	while( (t = getToken(br, lexeme)) != DONE){
+		cout << lexeme;
+		counters[t]++;
+		lexeme = "";
+	}
+	
+	map<Token, int>::iterator it;
+	for(it = counters.begin(); it != counters.end(); it++){
+		cout << it->first << ":" << it->second << endl;
+	}
+	//Token t = getToken(br, lexeme);
 
 return 0;
 }
