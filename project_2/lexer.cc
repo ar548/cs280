@@ -5,11 +5,13 @@
 
 using namespace std;
 
+string lexeme = "";
 int main(int argc, char* argv[]){
 	
 	istream *br;
 	ifstream infile;
-	
+	string lexeme = "";
+
 	if(argc == 2){
 		//get tokens from file
 		infile.open(argv[1]);
@@ -23,16 +25,7 @@ int main(int argc, char* argv[]){
 	}
 	else if(argc == 1){
 		//get tokens from cmdln input
-		string line;
-		bool done = false;
-		while( cin.good() && !done ){
-			cin >> line;
-			if(line == "done"){
-				done = true;
-				break;
-			}
-			cout << line << endl;
-		}
+		br = &cin;
 	}
 	else{
 		cerr << "Error: Too many args" << endl;
@@ -40,6 +33,8 @@ int main(int argc, char* argv[]){
 		cerr << "It can take 1 arg which is the name of a file it will read" << endl;
 		return 1;
 	}
+
+	getToken(br, &lexeme);
 
 return 0;
 }
