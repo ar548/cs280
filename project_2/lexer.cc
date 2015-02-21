@@ -37,7 +37,13 @@ int main(int argc, char* argv[]){
 	map<Token, int> counters;
 	Token t;
 	while( (t = getToken(br, lexeme)) != DONE){
-		cout << lexeme << endl;
+		//cout << lexeme << endl;
+		if(t == ID)
+			cout << lexeme << endl;
+		else if(t == PLUS || t == MINUS || t == SLASH || t == STAR)
+			cout << "MATH" << endl;
+		else if(t == SC)
+			cout << "semi-colon" << endl;
 		counters[t]++;
 	}
 	
@@ -56,7 +62,44 @@ Token getToken(istream *br, string &lexeme){
 	if(br->good()){
 		while(br->good()){
 			ch = br->get();
-			if( (ch >= 'A'&& ch <= 'Z') || (ch >= 'a' && ch <= 'z') ){
+			if(ch == '+'){
+				T = PLUS;
+				break;
+			}
+			else if(ch == '-'){
+				T = MINUS;
+				break;
+			}
+			else if(ch == '*'){
+				T = STAR;
+				break;
+			}
+			else if(ch == '/'){
+				if(br->peek() == '/'){
+					do{
+						ch = br->get();
+					}while(ch != '\n');
+					continue;
+				}
+				else{
+					T = SLASH;
+				}
+				break;
+			}
+			else if(ch == ';'){
+				T = SC;
+				break;
+			}
+			else if(ch == '"'){
+				T = STRING;
+				do{
+					ch = br->get();
+					lexeme += ch;
+				}while(ch != '"');
+				cout << "The string recognised was: \"" << lexeme  << endl;
+				break;
+			}
+			else if( (ch >= 'A'&& ch <= 'Z') || (ch >= 'a' && ch <= 'z') ){
 				lexeme += ch;
 			}
 			else{
