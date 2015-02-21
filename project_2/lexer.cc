@@ -5,7 +5,6 @@
 
 using namespace std;
 
-string lexeme = "";
 int main(int argc, char* argv[]){
 	
 	istream *br;
@@ -33,10 +32,8 @@ int main(int argc, char* argv[]){
 		cerr << "It can take 1 arg which is the name of a file it will read" << endl;
 		return 1;
 	}
-
-	getToken(br, &lexeme);
+	
+	Token t = getToken(br, lexeme);
 
 return 0;
 }
-
-
