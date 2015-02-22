@@ -3,6 +3,7 @@
 #include<string>
 #include<fstream>
 #include<map>
+#include<vector>
 
 using namespace std;
 
@@ -36,22 +37,43 @@ int main(int argc, char* argv[]){
 	
 	map<Token, int> counters;
 	Token t;
+	vector<string> IDs;
+	vector<string> INTs;
+	bool inVec = false;
 	while( (t = getToken(br, lexeme)) != DONE){
-		//cout << lexeme << endl;
-		if(t == ID)
-			cout << lexeme << endl;
-		else if(t == PLUS || t == MINUS || t == SLASH || t == STAR)
+		if(t == ID){
+			cout << "ID: " << lexeme << " " << endl;
+			for(int i = 0; i < IDs.size(); i++){
+				if(IDs[i] == lexeme){
+					inVec = true;
+				}
+			}
+			if(!inVec){
+				IDs.push_back(lexeme);
+				counters[t]++;
+			}
+			else{
+				inVec = false;
+			}
+		}
+		else if(t == PLUS || t == MINUS || t == SLASH || t == STAR){
 			cout << "MATH" << endl;
-		else if(t == SC)
+			counters[t]++;
+		}
+		else if(t == SC){
 			cout << "semi-colon" << endl;
-		else if(t == INT)
-			cout << "INT" << endl;
+			counters[t]++;
+		}
+		else if(t == INT){
+			cout << "INT: " << lexeme << endl;
+			INTs.push_back(lexeme);
+			counters[t]++;
+		}
 		else if(t == DONE)
 			cout << "THATS IT BABY" << endl;
 
-		counters[t]++;
 	}
-	
+
 	map<Token, int>::iterator it;
 	//for(it = counters.begin(); it != counters.end(); it++){
 	//	cout << it->first << ":" << it->second << endl;
@@ -67,9 +89,19 @@ int main(int argc, char* argv[]){
 	cout << "SET    : " << counters[SET] << endl;
 	cout << "PRINT  : " << counters[PRINT] << endl;
 	cout << "SC     : " << counters[SC] << endl;
-	cout << "DONE   : " << counters[DONE] << endl;
+	cout << "DONE   : 1"<< endl;
 
+	cout << "The unique IDs were ";
+	for (int i = 0; i<IDs.size(); i++){
+		cout << IDs[i] << " ";
+	}
+	cout << endl;
 
+	cout << "The ints found were ";
+	for (int i = 0; i<INTs.size(); i++){
+		cout << INTs[i] << " ";
+	}
+	cout << endl;
 return 0;
 }
 
@@ -116,7 +148,7 @@ Token getToken(istream *br, string &lexeme){
 					ch = br->get();
 					if (ch == '\n'){
 						T = DONE;
-						break;
+						return T;
 					}
 					lexeme += ch;
 				}
@@ -125,6 +157,22 @@ Token getToken(istream *br, string &lexeme){
 			}
 			else if( (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') ){
 				lexeme += ch;
+				while( (br->peek() >= 'A' && br->peek() <= 'Z') || (br->peek() >= 'a' && br->peek() <= 'z') ){
+					ch = br->get();
+					lexeme += ch;
+				}
+				if(lexeme == "set"){
+					T = SET;
+					return SET;
+				}
+				else if(lexeme == "print"){
+					T = PRINT;
+					return T;
+				}
+				else{
+					T = ID;
+					return T;
+				}
 			}
 			else if( (ch >= '0' && ch <= '9') ){
 				T = INT;
@@ -133,10 +181,6 @@ Token getToken(istream *br, string &lexeme){
 					ch = br->get();
 					lexeme += ch;
 				}
-				break;
-			}
-			else{
-				T = ID;
 				break;
 			}
 		}
