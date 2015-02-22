@@ -44,13 +44,31 @@ int main(int argc, char* argv[]){
 			cout << "MATH" << endl;
 		else if(t == SC)
 			cout << "semi-colon" << endl;
+		else if(t == INT)
+			cout << "INT" << endl;
+		else if(t == DONE)
+			cout << "THATS IT BABY" << endl;
+
 		counters[t]++;
 	}
 	
 	map<Token, int>::iterator it;
-	for(it = counters.begin(); it != counters.end(); it++){
-		cout << it->first << ":" << it->second << endl;
-	}
+	//for(it = counters.begin(); it != counters.end(); it++){
+	//	cout << it->first << ":" << it->second << endl;
+	//}
+	
+	cout << "ID     : " << counters[ID] << endl;
+	cout << "INT    : " << counters[INT] << endl;
+	cout << "STRING : " << counters[STRING] << endl;
+	cout << "PLUS   : " << counters[PLUS] << endl;
+	cout << "MINUS  : " << counters[MINUS] << endl;
+	cout << "STAR   : " << counters[STAR] <<endl;
+	cout << "SLASH  : " << counters[SLASH] << endl;
+	cout << "SET    : " << counters[SET] << endl;
+	cout << "PRINT  : " << counters[PRINT] << endl;
+	cout << "SC     : " << counters[SC] << endl;
+	cout << "DONE   : " << counters[DONE] << endl;
+
 
 return 0;
 }
@@ -92,15 +110,30 @@ Token getToken(istream *br, string &lexeme){
 			}
 			else if(ch == '"'){
 				T = STRING;
-				do{
+				ch = br->get();
+				lexeme += ch;
+				while(ch != '"'){
 					ch = br->get();
+					if (ch == '\n'){
+						T = DONE;
+						break;
+					}
 					lexeme += ch;
-				}while(ch != '"');
+				}
 				cout << "The string recognised was: \"" << lexeme  << endl;
 				break;
 			}
-			else if( (ch >= 'A'&& ch <= 'Z') || (ch >= 'a' && ch <= 'z') ){
+			else if( (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') ){
 				lexeme += ch;
+			}
+			else if( (ch >= '0' && ch <= '9') ){
+				T = INT;
+				lexeme += ch;
+				while(br->peek() >= '0' && br->peek() <= '9'){
+					ch = br->get();
+					lexeme += ch;
+				}
+				break;
 			}
 			else{
 				T = ID;
