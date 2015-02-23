@@ -91,8 +91,9 @@ int main(int argc, char* argv[]){
 	}
 
 	if(br->good()){
-		cerr << "Error: encountered lexically incorrect statement." << endl;
+		cerr << endl << "Error: encountered lexically incorrect statement." << endl;
 	}
+	cout << endl;
 
 	cout << "ID     : " << counters[ID]     << endl;
 	cout << "INT    : " << counters[INT]    << endl;
@@ -104,7 +105,7 @@ int main(int argc, char* argv[]){
 	cout << "SET    : " << counters[SET]    << endl;
 	cout << "PRINT  : " << counters[PRINT]  << endl;
 	cout << "SC     : " << counters[SC]     << endl;
-	cout << "DONE   : 1"<< endl;
+	cout << "DONE   : 1"<< endl << endl;
 
 	cout << "The unique IDs were ";
 	for (int i = 0; i<IDs.size(); i++){
@@ -116,6 +117,6 @@ int main(int argc, char* argv[]){
 	for (int i = 0; i<INTs.size(); i++){
 		cout << INTs[i] << " ";
 	}
-	cout << endl;
+	cout << endl << endl;
 return 0;
 }
