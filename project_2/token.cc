@@ -1,44 +1,97 @@
 #include "p2lex.h"
-#include <fstream>
-#include <iostream>
+#include<iostream>
+#include<string>
+#include<fstream>
+#include<map>
+#include<vector>
+
+using namespace std;
 
 Token getToken(istream *br, string &lexeme){
+	Token T;
 	lexeme = "";
 	char ch;
-	string word;
-	while(br->good()){
-		ch = br->get();
-		if( (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') ){
-			//TODO put some logical logic here
-			lexeme += ch;
-		}
-		else if(ch == '+'){
-			return PLUS;
-		}
-		else if(ch == '-'){
-			return MINUS;
-		}
-		else if(ch == '*'){
-			return STAR;
-		}
-		else if(ch == '/'){
-			return SLASH;
-		}
-		else if(ch == ';'){
-			return SC;
-		}
-		else{
-			if(lexeme == "set"){
-				cout << "set" << endl;
+	if(br->good()){
+		while(br->good()){
+			ch = br->get();
+			if(ch == '+'){
+				T = PLUS;
+				break;
 			}
-			else if (lexeme == "print"){
-				cout << "print" << endl;
+			else if(ch == '-'){
+				T = MINUS;
+				break;
 			}
-			else{
-				lexeme = word;
-				return ID;
+			else if(ch == '*'){
+				T = STAR;
+				break;
+			}
+			else if(ch == '/'){
+				if(br->peek() == '/'){
+					// this statement is needed because both SLASH and a comment start with a
+					// '/'
+					do{
+						ch = br->get();
+					}while(ch != '\n');
+					continue;
+				}
+				else{
+					T = SLASH;
+				}
+				break;
+			}
+			else if(ch == ';'){
+				T = SC;
+				break;
+			}
+			else if(ch == '"'){
+				T = STRING;
+				lexeme += ch;
+				ch = br->get();
+				lexeme += ch;
+				while(ch != '"'){
+					ch = br->get();
+					if (ch == '\n'){
+						//handles the possibility of an incomplete string
+						T = DONE;
+						return T;
+					}
+					lexeme += ch;
+				}
+				break;
+			}
+			else if( (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') ){
+				lexeme += ch;
+				while( (br->peek() >= 'A' && br->peek() <= 'Z') || (br->peek() >= 'a' && br->peek() <= 'z') ){
+					ch = br->get();
+					lexeme += ch;
+				}
+				if(lexeme == "set"){
+					T = SET;
+					return SET;
+				}
+				else if(lexeme == "print"){
+					T = PRINT;
+					return T;
+				}
+				else{
+					T = ID;
+					return T;
+				}
+			}
+			else if( (ch >= '0' && ch <= '9') ){
+				T = INT;
+				lexeme += ch;
+				while(br->peek() >= '0' && br->peek() <= '9'){
+					ch = br->get();
+					lexeme += ch;
+				}
+				break;
 			}
 		}
 	}
-	Token t = DONE;
-};
+	else{
+		T = DONE;
+	}
+	return T;
+}

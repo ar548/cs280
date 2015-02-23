@@ -1,7 +1,15 @@
 x identifier hello hello x
 123 		245 1 123
 "this is a string"
-"hi"
+"hi"; print set print
 + + - - * * / / //this is a comment
-; ; ; 
+ ; ; 
 
+
+
+"this was a partial string, now its not;"
+more stuff print done DO12345NE hey
+
+"this is now a partial string
+
+lalala lala la la la
