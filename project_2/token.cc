@@ -96,6 +96,13 @@ Token getToken(istream *br, string &lexeme){
 				}
 				break;
 			}
+			else if( (ch == ' ' || ch == '\n' || ch == '\t') ){
+				continue;
+			}
+			else{
+				T = DONE;
+				return T;
+			}
 			// add the unacceptable characters that will cause errors here
 			// OR
 			// add a list of acceptable characters that will account for all
