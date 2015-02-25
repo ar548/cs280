@@ -10,7 +10,10 @@ Token getToken(istream *br, string &lexeme){
 	lexeme = "";
 	char ch;
 	if(br->good()){
-		while(br->good()){
+		while(br->good()){	
+			// This loop is unneeded for the most part and is only 
+			// used for the comments.  It can be replaced with a 
+			// GoTo statement however for this case the while loop is more efficent
 			ch = br->get();
 			if(ch == '+'){
 				T = PLUS;
@@ -86,6 +89,10 @@ Token getToken(istream *br, string &lexeme){
 				}
 				break;
 			}
+			// add the unacceptable characters that will cause errors here
+			// OR
+			// add a list of acceptable characters that will account for all
+			// possible cases of acceptable characters
 		}
 	}
 	else{
