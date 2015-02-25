@@ -1,7 +1,7 @@
 #include "p2lex.h"
-#include<iostream>
-#include<string>
-#include<fstream>
+#include <iostream>
+#include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -11,8 +11,8 @@ Token getToken(istream *br, string &lexeme){
 	char ch;
 	if(br->good()){
 		while(br->good()){	
-			// This loop is unneeded for the most part and is only 
-			// used for the comments.  It can be replaced with a 
+			// This loop is unneeded for the most part because the code inside
+			// should only run if there is a comment.  It can be replaced with a 
 			// GoTo statement however for this case the while loop is more efficent
 			ch = br->get();
 			if(ch == '+'){
@@ -29,12 +29,12 @@ Token getToken(istream *br, string &lexeme){
 			}
 			else if(ch == '/'){
 				if(br->peek() == '/'){
-					// this statement is needed because both SLASH and a comment start with a
-					// '/'
+					// this statement is needed because both SLASH 
+					// and a comment start with a '/'
 					do{
 						ch = br->get();
 					}while(ch != '\n');
-					continue;
+					continue;	// This makes the outer while loop function as a 
 				}
 				else{
 					T = SLASH;
@@ -57,11 +57,17 @@ Token getToken(istream *br, string &lexeme){
 						T = DONE;
 						return T;
 					}
-					lexeme += ch;
+					else{
+						lexeme += ch;
+					}
 				}
 				break;
 			}
 			else if( (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') ){
+				// This section handles all of the IDs and treats SET and PRINT as special
+				// cases of IDs (a.k.a. reserved words)
+				// It could also be made to handle strings but that was put elsewhere
+				// for the sake of readibility
 				lexeme += ch;
 				while( (br->peek() >= 'A' && br->peek() <= 'Z') || (br->peek() >= 'a' && br->peek() <= 'z') ){
 					ch = br->get();
@@ -81,6 +87,7 @@ Token getToken(istream *br, string &lexeme){
 				}
 			}
 			else if( (ch >= '0' && ch <= '9') ){
+				// This block handles INTs of any length (not just 32 bit ints. 
 				T = INT;
 				lexeme += ch;
 				while(br->peek() >= '0' && br->peek() <= '9'){

@@ -41,13 +41,18 @@ int main(int argc, char* argv[]){
 	vector<string> INTs;
 	bool inVec = false;
 	while( (t = getToken(br, lexeme)) != DONE){
-		//gets the tokens one at a time from the given input
-		//then tests whether a lexeme needs to be stored
+		// Gets the tokens one at a time from the given input
+		// then stores the lexeme to the list if appropiate.
+		// NOTE:  all the cout statements are for testing porposes only
 		if(t == ID){
 			cout << "ID: " << lexeme << " " << endl;
 			for(int i = 0; i < IDs.size(); i++){
 				if(IDs[i] == lexeme){
+					// Tests if the ID has been found already
+					// if it has then it will not be added to the 
+					// list otherwise it will.
 					inVec = true;
+					break;
 				}
 			}
 			if(!inVec){
