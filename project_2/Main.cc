@@ -85,9 +85,8 @@ int main(int argc, char* argv[]){
 		cout << "set keyword:" << counters[SET] << endl;
 	if(counters[PRINT] != 0)
 		cout << "print keyword:" << counters[PRINT] << endl;
-	if(counters[SC] != 0){
+	if(counters[SC] != 0)
 		cout << "semicolon:" << counters[SC] << endl;
-	}
 	
 	if(IDs.size() != 0){
 		cout << "List of identifiers: ";

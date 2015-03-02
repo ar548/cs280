@@ -87,7 +87,7 @@ Token getToken(istream *br, string &lexeme){
 				}
 			}
 			else if( (ch >= '0' && ch <= '9') ){
-				// This block handles INTs of any length (not just 32 bit ints. 
+				// This block handles INTs of any length (eg. not just 32 bit ints). 
 				T = INT;
 				lexeme += ch;
 				while(br->peek() >= '0' && br->peek() <= '9'){
@@ -103,10 +103,6 @@ Token getToken(istream *br, string &lexeme){
 				T = DONE;
 				return T;
 			}
-			// add the unacceptable characters that will cause errors here
-			// OR
-			// add a list of acceptable characters that will account for all
-			// possible cases of acceptable characters
 		}
 	}
 	else{
