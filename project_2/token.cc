@@ -16,16 +16,13 @@ Token getToken(istream *br, string &lexeme){
 			// GoTo statement however for this case the while loop is more efficent
 			ch = br->get();
 			if(ch == '+'){
-				T = PLUS;
-				break;
+				return PLUS;
 			}
 			else if(ch == '-'){
-				T = MINUS;
-				break;
+				return MINUS;
 			}
 			else if(ch == '*'){
-				T = STAR;
-				break;
+				return STAR;
 			}
 			else if(ch == '/'){
 				if(br->peek() == '/'){
@@ -37,16 +34,13 @@ Token getToken(istream *br, string &lexeme){
 					continue;	// This makes the outer while loop function as a 
 				}
 				else{
-					T = SLASH;
+					return SLASH;
 				}
-				break;
 			}
 			else if(ch == ';'){
-				T = SC;
-				break;
+				return SC;
 			}
 			else if(ch == '"'){
-				T = STRING;
 				lexeme += ch;
 				ch = br->get();
 				lexeme += ch;
@@ -54,14 +48,13 @@ Token getToken(istream *br, string &lexeme){
 					ch = br->get();
 					if (ch == '\n'){
 						//handles the possibility of an incomplete string
-						T = DONE;
-						return T;
+						return DONE;
 					}
 					else{
 						lexeme += ch;
 					}
 				}
-				break;
+				return STRING;
 			}
 			else if( (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') ){
 				// This section handles all of the IDs and treats SET and PRINT as special
@@ -74,39 +67,33 @@ Token getToken(istream *br, string &lexeme){
 					lexeme += ch;
 				}
 				if(lexeme == "set"){
-					T = SET;
 					return SET;
 				}
 				else if(lexeme == "print"){
-					T = PRINT;
-					return T;
+					return PRINT;
 				}
 				else{
-					T = ID;
-					return T;
+					return ID;
 				}
 			}
 			else if( (ch >= '0' && ch <= '9') ){
-				// This block handles INTs of any length (eg. not just 32 bit ints). 
-				T = INT;
+				// This block handles INTs of any length (eg. not just 32 bit ints).
 				lexeme += ch;
 				while(br->peek() >= '0' && br->peek() <= '9'){
 					ch = br->get();
 					lexeme += ch;
 				}
-				break;
+				return INT;
 			}
 			else if( (ch == ' ' || ch == '\n' || ch == '\t') ){
 				continue;
 			}
 			else{
-				T = DONE;
-				return T;
+				return DONE;
 			}
 		}
 	}
 	else{
-		T = DONE;
+		return DONE;
 	}
-	return T;
 }
