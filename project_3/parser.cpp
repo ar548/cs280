@@ -1,43 +1,59 @@
 #include "p3lex.h"
 #include <vector>
+#include <fstream>
+
+using namespace std;
 
 class program{
 private:
 	stmtlist s();
 public:
-	program(istream *br, string& lexeme);
-
+	program(istream *br, string& lexeme){
+		getToken(br, lexeme);
+	}
 };
 
 class stmtlist{
 private:
 	vector<stmt> stmts;
 public:
-
+	stmtlist();
 };
 
 class stmt{
-
+private:
+public:
+	stmt();
 };
 
 class print : public stmt{
-
+private:
+public:
+	print(){}
 };
 
 class set : public stmt{
-
+private:
+public:
+	set(){}
 };
 
 class expr{
-
+private:
+public:
+	expr(){}
 };
 
 class term{
-
+private:
+public:
+	term(){}
 };
 
 class primary{
-
+private:
+public:
+	primary(){}
 };
 
 

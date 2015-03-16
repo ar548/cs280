@@ -1,9 +1,12 @@
 #include "p3lex.h"
+#include "classes.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
 
-extern void program(istream *br, string &lexeme);
+using namespace std;
+
+program::program(istream *br, string &lexeme);
 extern void stmtList();
 extern void print();
 extern void set();
@@ -39,7 +42,7 @@ int main(int argc, char* argv[]){
 		return 1;
 	}
 
-	program(br, lex);
+	program prg(br, lex);
 
 return 0;
 }
