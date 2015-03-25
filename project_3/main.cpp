@@ -1,18 +1,10 @@
-#include "p3lex.h"
+#include "p2lex.h"
 #include "classes.h"
 #include <iostream>
-#include <fstream>
 #include <vector>
+#include <fstream>
 
 using namespace std;
-
-program::program(istream *br, string &lexeme);
-extern void stmtList();
-extern void print();
-extern void set();
-extern void expr();
-extern void term();
-extern void primary();
 
 int main(int argc, char* argv[]){
 
@@ -38,7 +30,7 @@ int main(int argc, char* argv[]){
 	else{
 		cerr << "Error: Too many args" << endl;
 		cerr << "This program takes either no args and reads standard user input or\n";
-		cerr << "It can take 1 arg which is the name of a file it will read" << endl;
+		cerr << "It can take 1 arg which is the name of a file it will read\n";
 		return 1;
 	}
 
