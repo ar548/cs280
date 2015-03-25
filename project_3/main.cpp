@@ -59,17 +59,19 @@ PTree *StmtList(istream *br){
 
 // Stmt ::= PRINT Expr SC | SET ID Expr SC
 PTree *Stmt(istream *br){
-	PTree *stmt;
 	string lex;
 
 	Token T = getToken(br, lex);
 	if( T == PRINT ){
+		// the statement a PRINT statement
 		return new PTreePrint( Expr(br) );	
 	}
 	else if( T == SET ){
+		// the statement a SET statement
 		Token T2 = getToken(br, lex);
 		if( T2 != ID ){
-			cerr << "A set statement must follow the pattern \"SET ID Expr;\"" << endl;
+			cerr << "Error : invalid set statement at line " << currLine  << "." << endl;
+			cerr << "\tA set statement must follow the pattern \"SET ID Expr;\"" << endl;
 			return 0;
 		}
 		else{
@@ -80,8 +82,8 @@ PTree *Stmt(istream *br){
 		}	
 	}
 	else{
-		cerr << "This is an invalid statement" << endl;
-		cerr << "A statement is either \"PRINT Expr;\" or \"SET ID Expr;\"" << endl;
+		cerr << "Error : invalid statement at line " << currLine  << "." << endl;
+		cerr << "\tA valid statement is either \"PRINT Expr;\" or \"SET ID Expr;\"" << endl;
 		// TODO ask the prof what needs to be done in the case of a non conforming statement
 		return 0;
 	}
@@ -89,6 +91,9 @@ PTree *Stmt(istream *br){
 
 // Expr ::= Expr PLUS Term | Expr MINUS Term | Term
 PTree *Expr(istream *br){
+	string lex;
+	//Token T1 = getToken(br, lex);
+
 	return 0;
 }
 
