@@ -4,8 +4,12 @@
 #include <string>
 #include <map>
 
+using namespace std;
+
 // global variables for the file
 map<string, int> setIDs;
+extern int currLine;
+
 
 class PTree {
 	PTree *left;
@@ -25,12 +29,62 @@ public:
 
 class PTreeSet : public PTree {
 public:
-	PTreeSet(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {};
+	PTreeSet(string& str, PTree *s1/*, PTree *s2 = 0/**/) : PTree(s1/*, s2*/) {
+		idToSet = str;
+	};
+	string idToSet;
 };
 
 class PTreePrint : public PTree {
 public:
 	PTreePrint(PTree *s) : PTree(s, 0) {};
+};
+
+class PTreeExpr : public PTree {
+public:
+	PTreeExpr(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {};
+};
+
+class PTreeTerm : public PTree {
+public:
+	PTreeTerm(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {};
+};
+
+class PTreeID : public PTree {
+public:
+	PTreeID(string& str) : PTree(0, 0) {
+		//this->left = 0;
+		//this->right = 0;
+		name = str;
+	}
+//private:		//this is only commented out for debugging purposes
+	string name;
+	int valInt;
+	string valString;
+};
+
+class PTreeSTRING : public PTree {
+public:
+	PTreeSTRING(string& str) : PTree(0, 0) {
+		//this->left = 0;
+		//this->right = 0;
+		val = str;
+	}
+//private: 		//this is only commented out for debugging purposes
+	string val;
+};
+
+class PTreeINT : public PTree {
+public:
+	PTreeINT(string str) : PTree(0, 0) {
+        	//this->left = 0;
+		//this->right = 0;
+		val = str;
+	}
+//private: 		// this is only commented out for debugging purposes
+
+	string val;	// TODO this needs to be changed to an int and I need to find a 
+			// 	a function to do that or write my own
 };
 
 extern PTree *Program(istream *br);
@@ -54,7 +108,9 @@ PTree *StmtList(istream *br){
 	if( stmt ){
 		return new PTreeStmtList( stmt, StmtList(br) );
 	}
-	return 0;
+	else{
+		return 0;
+	}
 }
 
 // Stmt ::= PRINT Expr SC | SET ID Expr SC
@@ -77,8 +133,8 @@ PTree *Stmt(istream *br){
 		else{
 			setIDs[lex] = 1;
 			return new PTreeSet( lex, Expr(br) );	// TODO this line needs to be fixed 
-								// ask the prof how to make just the ID
-								// a PTree leaf
+								// 	ask the prof how to make just 
+								// 	the ID a PTree leaf
 		}	
 	}
 	else{
@@ -92,9 +148,19 @@ PTree *Stmt(istream *br){
 // Expr ::= Expr PLUS Term | Expr MINUS Term | Term
 PTree *Expr(istream *br){
 	string lex;
-	//Token T1 = getToken(br, lex);
-
-	return 0;
+	Token T1 = getToken(br, lex);
+	
+	PTree *term = Term(br);
+	PTree *exp = Expr(br);
+	
+	if( term ){
+		return new PTreeExpr(term, exp);
+	}
+	else{
+		cerr << "Error : invalid expression at line " << currLine << "." << endl;
+		cerr << "\tA valid expression \"Term\" or \"Term {+|-} Expr\"" << endl;
+		return 0;
+	}
 }
 
 PTree *Term(istream *br){
@@ -102,7 +168,21 @@ PTree *Term(istream *br){
 }
 
 PTree *Primary(istream *br){
-	return 0;
+	string lex;
+	Token T = getToken(br, lex);
+	
+	if( T == ID ){
+
+	}
+	else if( T == INT ){
+
+	}
+	else if( T == STRING ){
+
+	}
+	else{
+		return 0;
+	}
 }
 
 int main(int argc, char *argv[]){
