@@ -10,7 +10,16 @@ using namespace std;
 map<string, int> setIDs;
 extern int currLine;
 
-
+// class definitions ->
+	// : PTree
+	// : PTreeStmtList
+	// : PTreeSet 
+	// : PTreePrint 
+	// : PTreeExpr 
+	// : PTreeTerm 
+	// : PTreeID 
+	// : PTreeSTRING 
+	// : PTreeINT
 class PTree {
 	PTree *left;
 	PTree *right;
@@ -29,7 +38,7 @@ public:
 
 class PTreeSet : public PTree {
 public:
-	PTreeSet(string& str, PTree *s1/*, PTree *s2 = 0/**/) : PTree(s1/*, s2*/) {
+	PTreeSet( string str, PTree *s2 ) : PTree(0, s2){
 		idToSet = str;
 	};
 	string idToSet;
@@ -172,13 +181,13 @@ PTree *Primary(istream *br){
 	Token T = getToken(br, lex);
 	
 	if( T == ID ){
-
+		return new PTreeID(lex);
 	}
 	else if( T == INT ){
-
+		return new PTreeINT(lex);
 	}
 	else if( T == STRING ){
-
+		return new PTreeSTRING(lex);
 	}
 	else{
 		return 0;
