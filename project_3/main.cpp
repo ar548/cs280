@@ -20,6 +20,7 @@ extern int currLine;
 	// : PTreeID 
 	// : PTreeSTRING 
 	// : PTreeINT
+
 class PTree {
 	PTree *left;
 	PTree *right;
@@ -31,10 +32,12 @@ public:
 	}
 };
 
+
 class PTreeStmtList : public PTree {
 public:
 	PTreeStmtList(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {};
 };
+
 
 class PTreeSet : public PTree {
 public:
@@ -44,54 +47,50 @@ public:
 	string idToSet;
 };
 
+
 class PTreePrint : public PTree {
 public:
 	PTreePrint(PTree *s) : PTree(s, 0) {};
 };
+
 
 class PTreeExpr : public PTree {
 public:
 	PTreeExpr(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {};
 };
 
+
 class PTreeTerm : public PTree {
 public:
 	PTreeTerm(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {};
 };
 
+
 class PTreeID : public PTree {
 public:
 	PTreeID(string& str) : PTree(0, 0) {
-		//this->left = 0;
-		//this->right = 0;
 		name = str;
 	}
-//private:		//this is only commented out for debugging purposes
 	string name;
 	int valInt;
 	string valString;
 };
 
+
 class PTreeSTRING : public PTree {
 public:
 	PTreeSTRING(string& str) : PTree(0, 0) {
-		//this->left = 0;
-		//this->right = 0;
 		val = str;
 	}
-//private: 		//this is only commented out for debugging purposes
 	string val;
 };
+
 
 class PTreeINT : public PTree {
 public:
 	PTreeINT(string str) : PTree(0, 0) {
-        	//this->left = 0;
-		//this->right = 0;
 		val = str;
 	}
-//private: 		// this is only commented out for debugging purposes
-
 	string val;	// TODO this needs to be changed to an int and I need to find a 
 			// 	a function to do that or write my own
 };
@@ -183,6 +182,7 @@ PTree *Expr(istream *br){
 	}
 }
 
+// Term ::= Term PLUS Primary | Term MINUS Primary | Primary
 PTree *Term(istream *br){
 	string lex;
 
@@ -209,6 +209,7 @@ PTree *Term(istream *br){
 	}
 }
 
+// Primary ::= STRING | INT | ID
 PTree *Primary(istream *br){
 	string lex;
 	Token T = getToken(br, lex);
@@ -255,4 +256,9 @@ int main(int argc, char *argv[]){
 	}
 
 	PTree *prg = Program(br);
+
+	// TODO add logic to traverse the tree and count the leaves
+	// 	leaves are equal to the number of primaries 
+	// 	or
+	// 	when left == 0 && right == 0
 }
