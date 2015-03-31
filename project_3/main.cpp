@@ -157,23 +157,56 @@ PTree *Stmt(istream *br){
 // Expr ::= Expr PLUS Term | Expr MINUS Term | Term
 PTree *Expr(istream *br){
 	string lex;
-	Token T1 = getToken(br, lex);
-	
+
 	PTree *term = Term(br);
-	PTree *exp = Expr(br);
-	
-	if( term ){
-		return new PTreeExpr(term, exp);
+	Token t = getToken(br, lex);
+	if(t == SC){
+		return new PTreeExpr(term, 0);
+	}
+	else if(t == PLUS){
+		// TODO add logic for if there is a plus sign
+		// 	add logic to store that is was a plus
+		PTree *exp = Expr(br);
+		return new PTreeExpr(term, exp);	// this may have to get an extra parameter for a plus sign
+	}
+	else if(t == MINUS){
+                // TODO add logic for if there is a minus sign
+		//      add logic to store that is was a minus
+		PTree *exp = Expr(br);
+		return new PTreeExpr(term, exp);	// this may have to get an extra parameter for the plus sign
 	}
 	else{
-		cerr << "Error : invalid expression at line " << currLine << "." << endl;
-		cerr << "\tA valid expression \"Term\" or \"Term {+|-} Expr\"" << endl;
+		cerr << "Error : invlaid expression at line " << currLine << "." << endl;
+		cerr << "\tA valid expression is \"Term\" or \"Term {+|-} Expr\"" << endl;
+		// TODO ask the prof what needs to be done in the case of an error and how to handle it
 		return 0;
 	}
 }
 
 PTree *Term(istream *br){
-	return 0;
+	string lex;
+
+	PTree *prmy = Primary(br);
+	Token t = getToken(br, lex);
+	if(t == SC){
+		return new PTreeTerm(prmy, 0);
+	}
+	else if(t == STAR){
+		// TODO add logic for when there is a star operator
+		// 	add logic to store the operator
+		PTree *term = Term(br);
+	}
+	else if(t == SLASH){
+		// TODO add logic for when there is a star operator
+		//	add logic to store the operator
+		PTree *term = Term(br);
+	}
+	else{
+		cerr << "Error : invlaid term at line " << currLine << "." << endl;
+		cerr << "\tA valid term is \"Primary\" or \"Primary {+|-} Term\"" << endl;
+		// TODO asm the prof hat needs to be done in the case of a parsing error and how to handle it
+		return 0;
+	}
 }
 
 PTree *Primary(istream *br){
