@@ -56,13 +56,22 @@ public:
 
 class PTreeExpr : public PTree {
 public:
-	PTreeExpr(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {};
+	PTreeExpr(char c, PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {
+		op = c;
+	};
+
+	char op;
+
 };
 
 
 class PTreeTerm : public PTree {
 public:
-	PTreeTerm(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {};
+	PTreeTerm(char c, PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {
+		op = c;
+	};
+
+	char op;
 };
 
 
@@ -160,19 +169,19 @@ PTree *Expr(istream *br){
 	PTree *term = Term(br);
 	Token t = getToken(br, lex);
 	if(t == SC){
-		return new PTreeExpr(term, 0);
+		return new PTreeExpr(NULL, term, 0);
 	}
 	else if(t == PLUS){
 		// TODO add logic for if there is a plus sign
 		// 	add logic to store that is was a plus
 		PTree *exp = Expr(br);
-		return new PTreeExpr(term, exp);	// this may have to get an extra parameter for a plus sign
+		return new PTreeExpr('+', term, exp);	// this may have to get an extra parameter for a plus sign
 	}
 	else if(t == MINUS){
                 // TODO add logic for if there is a minus sign
 		//      add logic to store that is was a minus
 		PTree *exp = Expr(br);
-		return new PTreeExpr(term, exp);	// this may have to get an extra parameter for the plus sign
+		return new PTreeExpr('-', term, exp);	// this may have to get an extra parameter for the plus sign
 	}
 	else{
 		cerr << "Error : invlaid expression at line " << currLine << "." << endl;
@@ -189,17 +198,19 @@ PTree *Term(istream *br){
 	PTree *prmy = Primary(br);
 	Token t = getToken(br, lex);
 	if(t == SC){
-		return new PTreeTerm(prmy, 0);
+		return new PTreeTerm(NULL, prmy, 0);
 	}
 	else if(t == STAR){
 		// TODO add logic for when there is a star operator
 		// 	add logic to store the operator
 		PTree *term = Term(br);
+		return new PTreeTerm('*', prmy, term);
 	}
 	else if(t == SLASH){
 		// TODO add logic for when there is a star operator
 		//	add logic to store the operator
 		PTree *term = Term(br);
+		return new PTreeTerm('/', prmy, term);
 	}
 	else{
 		cerr << "Error : invlaid term at line " << currLine << "." << endl;
