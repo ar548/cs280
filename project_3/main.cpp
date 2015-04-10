@@ -9,6 +9,7 @@ using namespace std;
 // global variables for the file
 map<string, int> setIDs;
 extern int currLine;
+int numLeaves = 0;
 
 // class definitions ->
 	// : PTree
@@ -32,12 +33,10 @@ public:
 	}
 };
 
-
 class PTreeStmtList : public PTree {
 public:
 	PTreeStmtList(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {};
 };
-
 
 class PTreeSet : public PTree {
 public:
@@ -47,12 +46,10 @@ public:
 	string idToSet;
 };
 
-
 class PTreePrint : public PTree {
 public:
 	PTreePrint(PTree *s) : PTree(s, 0) {};
 };
-
 
 class PTreeExpr : public PTree {
 public:
@@ -64,7 +61,6 @@ public:
 
 };
 
-
 class PTreeTerm : public PTree {
 public:
 	PTreeTerm(char c, PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {
@@ -73,7 +69,6 @@ public:
 
 	char op;
 };
-
 
 class PTreeID : public PTree {
 public:
@@ -85,7 +80,6 @@ public:
 	string valString;
 };
 
-
 class PTreeSTRING : public PTree {
 public:
 	PTreeSTRING(string& str) : PTree(0, 0) {
@@ -93,7 +87,6 @@ public:
 	}
 	string val;
 };
-
 
 class PTreeINT : public PTree {
 public:
@@ -145,19 +138,20 @@ PTree *Stmt(istream *br){
 		if( T2 != ID ){
 			cerr << "Error : invalid set statement at line " << currLine  << "." << endl;
 			cerr << "\tA set statement must follow the pattern \"SET ID Expr;\"" << endl;
+			pushbackToken(T2, lex);
 			return 0;
 		}
 		else{
 			setIDs[lex] = 1;
-			return new PTreeSet( lex, Expr(br) );	// TODO this line needs to be fixed 
-								// 	ask the prof how to make just 
-								// 	the ID a PTree leaf
+			//pushbackToken(T2, lex);
+			return new PTreeSet( lex, Expr(br) ); 
 		}	
 	}
+	else if( T == DONE ){
+		return 0;
+	}
 	else{
-		cerr << "Error : invalid statement at line " << currLine  << "." << endl;
-		cerr << "\tA valid statement is either \"PRINT Expr;\" or \"SET ID Expr;\"" << endl;
-		// TODO ask the prof what needs to be done in the case of a non conforming statement
+		cerr << currLine << ": not a valid statement" << endl;
 		return 0;
 	}
 }
@@ -172,21 +166,18 @@ PTree *Expr(istream *br){
 		return new PTreeExpr(NULL, term, 0);
 	}
 	else if(t == PLUS){
-		// TODO add logic for if there is a plus sign
-		// 	add logic to store that is was a plus
 		PTree *exp = Expr(br);
 		return new PTreeExpr('+', term, exp);	// this may have to get an extra parameter for a plus sign
 	}
 	else if(t == MINUS){
-                // TODO add logic for if there is a minus sign
-		//      add logic to store that is was a minus
 		PTree *exp = Expr(br);
-		return new PTreeExpr('-', term, exp);	// this may have to get an extra parameter for the plus sign
+		return new PTreeExpr('-', term, exp);	// this may have to get an extra parameter for the minus sign
+	}
+	else if(t == SET || t == PRINT){
+		cerr << currLine << ": Missing semicolon" << endl;
+		pushbackToken(t, lex);
 	}
 	else{
-		cerr << "Error : invlaid expression at line " << currLine << "." << endl;
-		cerr << "\tA valid expression is \"Term\" or \"Term {+|-} Expr\"" << endl;
-		// TODO ask the prof what needs to be done in the case of an error and how to handle it
 		return 0;
 	}
 }
@@ -197,25 +188,24 @@ PTree *Term(istream *br){
 
 	PTree *prmy = Primary(br);
 	Token t = getToken(br, lex);
-	if(t == SC){
+	if(t == SC || t == PLUS || t == MINUS){
+		pushbackToken(t, lex);
 		return new PTreeTerm(NULL, prmy, 0);
 	}
 	else if(t == STAR){
-		// TODO add logic for when there is a star operator
-		// 	add logic to store the operator
 		PTree *term = Term(br);
 		return new PTreeTerm('*', prmy, term);
 	}
 	else if(t == SLASH){
-		// TODO add logic for when there is a star operator
-		//	add logic to store the operator
 		PTree *term = Term(br);
 		return new PTreeTerm('/', prmy, term);
 	}
+	else if( t == SET || t == PRINT ){
+		pushbackToken(t, lex);
+		return new PTreeTerm(NULL, prmy, 0);
+	}
 	else{
-		cerr << "Error : invlaid term at line " << currLine << "." << endl;
-		cerr << "\tA valid term is \"Primary\" or \"Primary {+|-} Term\"" << endl;
-		// TODO asm the prof hat needs to be done in the case of a parsing error and how to handle it
+		pushbackToken(t, lex);
 		return 0;
 	}
 }
@@ -224,9 +214,16 @@ PTree *Term(istream *br){
 PTree *Primary(istream *br){
 	string lex;
 	Token T = getToken(br, lex);
-	
+	numLeaves++;
 	if( T == ID ){
-		return new PTreeID(lex);
+		if(setIDs[lex]){
+			return new PTreeID(lex);
+		}
+		else{
+			cerr << "Identifier " << lex << " is used without being set" << endl;
+			//exit(1);
+			return 0;
+		}
 	}
 	else if( T == INT ){
 		return new PTreeINT(lex);
@@ -267,9 +264,7 @@ int main(int argc, char *argv[]){
 	}
 
 	PTree *prg = Program(br);
-
-	// TODO add logic to traverse the tree and count the leaves
-	// 	leaves are equal to the number of primaries 
-	// 	or
-	// 	when left == 0 && right == 0
+	if( !(prg) && (numLeaves != 0) ){
+		cout << "There were " << numLeaves << " leaves in the parse tree." << endl;
+	}
 }
