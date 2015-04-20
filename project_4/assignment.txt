@@ -1,0 +1,20 @@
+For this assignment we are expanding on assignment 3.
+
+If you parse with no errors, then perform a semantic analysis on what you have parsed. For every error that you
+find, print an error message. The cases where the listed rules are violated are essentially rule 4 and rule 11.
+
+If there are no semantic errors, perform an interpretation of the parse tree. Evaluate the input in the order in
+which it was parsed.
+
+A set statement should result in performing an evaluation to determine the value of an expression and saving it
+in some manner associated with the identifier. 
+
+A print statement should result in performing an evaluation to determine the value of an expression and printing
+the value of the expression. Integers should simply be printed as integers. Quoted strings should be printed
+surrounded by quotation marks.
+
+Your program should read the file whose name is passed as a command line argument, or the standard input if no
+command line argument is provided.
+
+You may divide this assignment into as many files as you like. You MUST use p2lex.h from the prior assignments,
+with no changes.
