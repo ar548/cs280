@@ -131,7 +131,6 @@ public:
 		Value *l, *r;
 		l = left->eval();
 		r = right->eval();
-		
 
 		Value *answer;
 		if( l->getType() == T_INT )
@@ -213,11 +212,68 @@ public:
 	}
 
 	Value *eval(){
+		Value *l, *r;
+		l = left->eval();
+		r = right->eval();
+		
+		Value *ans;
+		if ( l->getType() == T_INT && r->getType() == T_INT ){
+			ans = new ValueInt(  l->getIValue() * r->getIValue() );
+		}
+		else if( l->getType() == T_INT && r->getType() == T_STRING ){
+			int n = l->getIValue();
+			string s1 = r->getSValue();
+			string a = "";
 
+			for(int i = 0; i<n; i++)
+				a += s1;
+			
+			ans = new ValueString(a);
+		}
+		else if( l->getType() == T_INT && r->getType() == T_STRING ){
+			int n = r->getIValue();
+			string s1 = r->getSValue();
+			string a = "";
+
+			for(int i = 0; i<n; i++)
+				a+= s1;
+
+			ans = new ValueString(a);
+		}
+		delete l;
+		delete r;
+		return ans;
+	
 	}
 };
 
-// ....
+class PTreeSlash : public PTree {
+public:
+	PTreeSlash(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {}
+	
+	// specification says:
+	// int / int = int
+	// string / int = string
+	// int / string = string
+	// all other combinations are errors
+	Types getType(){
+		if( ltype == T_NONE || rtype == T_NONE )
+			return T_NONE;
+
+		if( ltype == T_INT && rtype == T_INT )
+			return T_INT;
+		else if( (ltype == T_INT && rtype == T_STRING) || (ltype == T_STRING && rtype == T_INT) )
+			return T_STRING;
+		else{
+			cerr << "invalid division" << endl;
+			return T_NONE;
+		}
+	}
+
+	Value *eval(){
+
+	}
+};
 
 class PTreeID : public PTree {
 	string id;
