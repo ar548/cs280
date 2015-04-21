@@ -93,7 +93,7 @@ public:
 		v = left->eval();
 		
 		if(v->getType() == T_NONE){
-			cerr << "Unable to set " << id << ": invlaid expression" << endl;
+			cerr << "nonvalid expression" << endl;
 		}
 		else{
 			variables[id] = v;
@@ -103,6 +103,8 @@ public:
 		return new Value();
 	}
 }
+
+
 
 class PTreePlus : public PTree {
 public:
@@ -139,6 +141,79 @@ public:
 		delete l;
 		delete r;
 		return answer;
+	}
+};
+
+class PTreeMinus : public PTree {
+public:
+	PTreeMinus(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {}
+	
+	// specification says:
+	// int - int = int
+	// string - string = string
+	// anything else is an error
+	Types getType(){
+		Types ltype = left->getType();
+		Types rtype = right->getType();
+
+		if( ltype == T_NONE || rtype == T_NONE )
+			return T_NONE;
+		
+		if( ltype == rtype )
+			return ltype;
+		
+		return T_NONE;
+	}
+
+	Value *eval(){
+		Value *l, *r;
+		l = left->eval();
+		r = right->eval();
+
+		Value *ans;
+		if( l->getType() == T_INT ){
+			ans = new ValueInt( l->getIValue() - r->getIValue() );
+		}
+		else{
+			string s1 = l->getSValue();
+			string s2 = r->getSValue();
+			int x = s1.find(s2);
+			ans = new ValueString( s1.substr(0,x) + s1.substr(x+s2.length()) );
+		}
+		delete l;
+		delete r;
+		return ans;
+	}
+};
+
+class PTreeStar : public PTree {
+public:
+	PTreeStar(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {}
+	
+	// specification says:
+	// int * int = int
+	// int * string = string
+	// string * int = string
+	// anything else is an error
+	Types getType(){
+		Types ltype = left->getType();
+		Types rtype = right->getType();
+
+		if( ltype == T_NONE || rtype == T_NONE )
+			return T_NONE;
+
+		if( ltype == T_INT && rtype == T_INT )
+			return T_INT;
+		else if( (ltype == T_INT && rtype == T_STRING) || (ltype == T_STRING && rtype == T_INT) )
+			return T_STRING;
+		else{
+			cerr << "invalid multiplication" << endl;
+			return T_NONE;
+		}
+	}
+
+	Value *eval(){
+
 	}
 };
 
