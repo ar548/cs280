@@ -15,7 +15,7 @@ using namespace Values;
 // this is a global map used to keep values that are assigned to variables
 // the key is the identifier
 map<string,Value*> variables;
-
+int errcnt = 0;
 class PTree {
 protected:
 	PTree *left;
@@ -66,10 +66,41 @@ public:
 
 class PTreeSet : public PTree {
 public:
-	PTreeSet(PTree *expr, string lex): PTree(expr) {}
+	string id;
+	PTreeSet(PTree *expr, string lex): PTree(expr) {
+		this->id = lex;
+	}
 
-	Value *eval() {
-	
+	Types getType(){
+		Types t = left->getType();
+		if(t == T_NONE){
+			return T_NONE;
+		}
+		else if(t == T_STRING){
+			return T_STRING;
+		}
+		else if(t == T_INT){
+			return T_INT;
+		}
+		else{
+			cerr << "WTF" << endl;
+			return T_NONE;
+		}
+	}
+
+	Value *eval(){
+		Value *v;
+		v = left->eval();
+		
+		if(v->getType() == T_NONE){
+			cerr << "Unable to set " << id << ": invlaid expression" << endl;
+		}
+		else{
+			variables[id] = v;
+		}
+
+		delete v;
+		return new Value();
 	}
 }
 
@@ -99,6 +130,7 @@ public:
 		l = left->eval();
 		r = right->eval();
 		
+
 		Value *answer;
 		if( l->getType() == T_INT )
 			answer = new ValueInt( l->getIValue() + r->getIValue() );
@@ -156,30 +188,47 @@ public:
 
 // ... parser ...
 
-int
-main( int argc, char *argv[] )
-{
-    // ... initial stuff
-    
-cout << "test" << endl;
+int main( int argc, char *argv[] ){
+	istream *br;
+	ifstream in;
+
+	if (argc == 1){
+		br = &cin;
+	}
+	else if(argc == 2){
+		in.open(argv[1]);
+		if(in.is_open()){
+			br = &in;
+		}
+		else{
+			cerr << "Error: cannot open " << argv[1] << endl;
+			return 1;
+		}
+	}
+	else {
+		cerr << "Error: this program takes either no files or one filename as an argument" << endl;
+		return 1;
+	}
+		
+	cout << "test" << endl;
 	PTree *v1 = new PTreeINT(3);
 	PTree *v2 = new PTreeSTR("help");
 	Value *a = v1->eval();
 	Value *b = v2->eval();
 	cout << a << ":" << b << endl;
-cout << "/test" << endl;
+	cout << "/test" << endl;
 
-    PTree *program;
+	PTree *program;
 
-    program = Program(br);
+	program = Program(br);
 
-    if( !program || errcnt )
-    	return 0;
+	if( !program || errcnt )
+		return 0;
     
-    // do all semantic checks... then...
+	// do all semantic checks... then...
 
-    Value *val = program->eval();
-    delete val;
+	Value *val = program->eval();
+	delete val;
 
-    return 0;
+	return 0;
 }

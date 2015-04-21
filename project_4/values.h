@@ -22,20 +22,20 @@ public:
 
 	virtual int getIValue() {
 		cerr << "trying to get an int from something that isn't!\n";
-		exit(1);
+		//exit(1);
 	}
 	virtual string getSValue() {
 		cerr << "trying to get a string from something that isn't!\n";
-		exit(1);
+		//exit(1);
 	}
 
 	virtual void setIValue(int v) {
 		cerr << "trying to set an int for something that isn't!\n";
-		exit(1);
+		//exit(1);
 	}
 	virtual void setSValue(string s) {
 		cerr << "trying to set a string for something that isn't!\n";
-		exit(1);
+		//exit(1);
 	}
 
 	// this is the way you allow a type that you create to be printed by ostream
