@@ -1,10 +1,6 @@
-//
-//  skel4.cpp
-//  skeleton for assignment 4
-//
-
 #include "p2lex.h"
 #include "values.h"
+#include <cstdlib>
 #include <fstream>
 #include <map>
 
@@ -15,7 +11,10 @@ using namespace Values;
 // this is a global map used to keep values that are assigned to variables
 // the key is the identifier
 map<string,Value*> variables;
+map<string, int> setIDs;
 int errcnt = 0;
+extern int currLine;
+
 class PTree {
 protected:
 	PTree *left;
@@ -102,7 +101,7 @@ public:
 		delete v;
 		return new Value();
 	}
-}
+};
 
 
 
@@ -257,6 +256,9 @@ public:
 	// int / string = string
 	// all other combinations are errors
 	Types getType(){
+		Types ltype = left->getType();
+		Types rtype = right->getType();
+		
 		if( ltype == T_NONE || rtype == T_NONE )
 			return T_NONE;
 
@@ -271,7 +273,27 @@ public:
 	}
 
 	Value *eval(){
+		Value *l, *r;
+		l = left->eval();
+		r = right->eval();
 
+		Value *ans;
+		if ( l->getType() == T_INT && r->getType() == T_INT ){
+			ans = new ValueInt( (int)(l->getIValue() / r->getIValue()) );
+		}
+		else if( l->getType() == T_INT && r->getType() == T_STRING ){
+			int n = l->getIValue();
+			string s = r->getSValue();
+			ans = new ValueString( s.substr(s.length()-n) );
+		}
+		else if( l->getType() == T_STRING && r->getType() == T_INT ){
+			int n = r->getIValue();
+			string s = l->getSValue();
+			ans = new ValueString( s.substr(0, s.length()-n) );
+		}
+		delete l;
+		delete r;
+		return ans;
 	}
 };
 
@@ -280,7 +302,17 @@ class PTreeID : public PTree {
 public:
 	PTreeID(string id) : PTree() { this->id = id; }
 
-	// ...
+	Types getType(){
+		Value *v;
+		v = variables[id];
+		if( v->hasInt() ){
+			return T_INT;
+		}
+		else if( v->hasStr() ){
+			return T_STRING;
+		}
+		else return T_NONE;
+	}
 
 	Value *eval() {
 		Value *value, *copy;
@@ -306,10 +338,10 @@ public:
 	}
 };
 
-class PTreeSTR : public PTree {
+class PTreeSTRING : public PTree {
 	ValueString v;
 public:
-	PTreeSTR(string val) : PTree() { v.setSValue(val); }
+	PTreeSTRING(string val) : PTree() { v.setSValue(val); }
 	Types getType() { return T_STRING; }
 
 	Value *eval() {
@@ -317,7 +349,137 @@ public:
 	}
 };
 
-// ... parser ...
+extern PTree *Program(istream *br);
+extern PTree *StmtList(istream *br);
+extern PTree *Stmt(istream *br);
+extern PTree *Expr(istream *br);
+extern PTree *Term(istream *br);
+extern PTree *Primary(istream *br);
+
+PTree *Program(istream *br){
+	return StmtList(br);
+}
+
+PTree *StmtList(istream *br){
+	PTree *stmt;
+	stmt = Stmt(br);
+
+	if( stmt ){
+		return new PTreeStmtList( stmt, StmtList(br) );
+	}
+	else {
+		 return 0;
+	}
+}
+
+PTree *Stmt(istream *br){
+	string lex;
+	Token T = getToken(br, lex);
+	
+	if( T == PRINT ){
+		// the statement is a print statement
+		return new PTreePrint( Expr(br) );
+	}
+	else if( T == SET ){
+		// the statement a SET statement
+		Token T2 = getToken(br, lex);
+		if( T2 != ID ){
+			cerr << "Error : invalid set statement at line " << currLine  << "." << endl;
+			cerr << "\tA set statement must follow the pattern \"SET ID Expr;\"" << endl;
+			pushbackToken(T2, lex);
+			return 0;
+		}
+		else{
+			setIDs[lex] = 1;
+			return new PTreeSet( Expr(br), lex);
+		}
+	}
+	else if( T == DONE )
+		return 0;
+	else{
+		//cerr << currLine << ": not a valid statement" << endl;
+		return 0;
+	}
+}
+
+PTree *Expr(istream *br){
+	PTree *term = Term(br);
+	if( term == 0 ){
+		return 0;
+	}
+
+	string lex;
+	Token t = getToken(br, lex);
+	if( t != PLUS && t != MINUS ){
+		pushbackToken(t, lex);
+		return term;
+	}
+	
+	PTree *expr = Expr(br);
+	if( expr == 0 ) {
+		cerr << "Expected an expression" << endl;
+		return 0;
+	}
+	
+	if( t == PLUS )
+		return new PTreePlus(term,expr);
+	else if ( t == MINUS)
+		return new PTreeMinus(term,expr);
+	else{
+		cerr << "this should never print" << endl;
+		return 0;
+	}
+}
+
+PTree *Term(istream *br){
+	PTree *prmy = Primary(br);
+	if( prmy == 0 ){
+		return 0;
+	}
+
+	string lex;
+	Token t = getToken(br, lex);
+	if( t != STAR && t != SLASH ){
+		pushbackToken(t, lex);
+		return prmy;
+	}
+	
+	PTree *term = Term(br);
+	if( t == STAR )
+		return new PTreeStar(prmy, term);
+	else if( t == SLASH )
+		return new PTreeSlash(prmy, term);
+	else{
+		cerr << "this should never print" << endl;
+		return 0;
+	}
+}
+
+PTree *Primary(istream *br){
+	string lex;
+	Token t = getToken(br, lex);
+	
+	if( t == ID ){
+		if(setIDs[lex]){
+			return new PTreeID(lex);
+		}
+		else {
+			cerr << "Identifier " << lex << " is used without being set" << endl;
+			return 0;
+		}
+	}
+	else if( t == INT ){
+		return new PTreeINT( atoi(lex.c_str()) );
+	}
+	else if( t == STRING){
+		return new PTreeSTRING(lex);
+	}
+	else {
+		cerr << currLine << ": invlaid primary" << endl;
+		pushbackToken(t, lex);
+		return 0;
+	}
+}
 
 int main( int argc, char *argv[] ){
 	istream *br;
@@ -340,19 +502,19 @@ int main( int argc, char *argv[] ){
 		cerr << "Error: this program takes either no files or one filename as an argument" << endl;
 		return 1;
 	}
-		
-	cout << "test" << endl;
-	PTree *v1 = new PTreeINT(3);
-	PTree *v2 = new PTreeSTR("help");
-	Value *a = v1->eval();
-	Value *b = v2->eval();
-	cout << a << ":" << b << endl;
-	cout << "/test" << endl;
+	
+	if(debug){
+		cout << "test" << endl;
+		PTree *v1 = new PTreeINT(3);
+		PTree *v2 = new PTreeSTRING("help");
+		Value *a = v1->eval();
+		Value *b = v2->eval();
+		cout << a << ":" << b << endl;
+		cout << "/test" << endl;
+	}
 
 	PTree *program;
-
 	program = Program(br);
-
 	if( !program || errcnt )
 		return 0;
     
