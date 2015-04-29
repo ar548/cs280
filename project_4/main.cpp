@@ -14,6 +14,9 @@ map<string,Value*> variables;
 map<string, int> setIDs;
 int errcnt = 0;
 extern int currLine;
+bool debug = false;
+
+int numNodes = 0;
 
 class PTree {
 protected:
@@ -24,10 +27,27 @@ public:
 	PTree(PTree *left = 0, PTree *right = 0) {
 		this->left = left;
 		this->right = right;
+		numNodes++;
 	}
 
-	// ... other stuff ...
-	//
+	int leafCount(){
+		int c = 0;
+
+		if( left == 0 && right == 0 ) return 1;
+		if( left ) c += left->leafCount();
+		if( right ) c += right->leafCount();
+
+		return c;
+	}
+
+	virtual bool checkSetFirst(map<string,int>& varsSet) {
+		bool leftans = true, rightans = true;
+		if( left ) leftans = left->checkSetFirst(varsSet);
+		if( !leftans ) return false;
+		if( right ) rightans = right->checkSetFirst(varsSet);
+		return rightans;
+	}
+	
 	virtual Types getType() { return T_NONE; }
 
 	virtual Value *eval() { return new Value(); }
@@ -38,14 +58,14 @@ public:
 	PTreeStmtList(PTree *s1, PTree *s2 = 0) : PTree(s1, s2) {}
 
 	Value *eval() {
-		Value *v;
+		Value *v1, *v2;
 		if( left ) {
-			v = left->eval();
-			delete v;
+			v1 = left->eval();
+			delete v1;
 		}
 		if( right ) {
-			v = right->eval();
-			delete v;
+			v2 = right->eval();
+			delete v2;
 		}
 		return new Value();
 	}
@@ -96,6 +116,9 @@ public:
 		}
 		else{
 			variables[id] = v;
+			if(debug){
+				cout << "setting " << id << " to " << v << endl;
+			}
 		}
 
 		delete v;
@@ -231,7 +254,7 @@ public:
 		}
 		else if( l->getType() == T_INT && r->getType() == T_STRING ){
 			int n = r->getIValue();
-			string s1 = r->getSValue();
+			string s1 = l->getSValue();
 			string a = "";
 
 			for(int i = 0; i<n; i++)
@@ -284,12 +307,24 @@ public:
 		else if( l->getType() == T_INT && r->getType() == T_STRING ){
 			int n = l->getIValue();
 			string s = r->getSValue();
-			ans = new ValueString( s.substr(s.length()-n) );
+			
+			if( n > s.length() )
+				ans = new ValueString(s);
+			else if( n < 0 )
+				ans = new ValueString("");
+			else
+				ans = new ValueString( s.substr(s.length()-n) );
 		}
 		else if( l->getType() == T_STRING && r->getType() == T_INT ){
 			int n = r->getIValue();
 			string s = l->getSValue();
-			ans = new ValueString( s.substr(0, s.length()-n) );
+			
+			if( n > s.length() )
+				ans = new ValueString(s);
+			else if( n > 0 )
+				ans = new ValueString("");
+			else
+				ans = new ValueString( s.substr(0, s.length()-n) );
 		}
 		delete l;
 		delete r;
@@ -374,30 +409,55 @@ PTree *StmtList(istream *br){
 
 PTree *Stmt(istream *br){
 	string lex;
-	Token T = getToken(br, lex);
+	Token T;
 	
+	T = getToken(br, lex);
 	if( T == PRINT ){
 		// the statement is a print statement
-		return new PTreePrint( Expr(br) );
+		PTree *expr = Expr(br);
+		if( expr == 0 ) {
+			cerr << currLine << ": Expected an expression" << endl;
+			return 0;
+		}
+		
+		Token T2;
+		T2 = getToken(br, lex);
+		if( T2 != SC ){
+			cerr << currLine << ": Missing semicolon" << endl;
+			return 0;
+		}
+		return new PTreePrint( expr );
 	}
 	else if( T == SET ){
 		// the statement a SET statement
-		Token T2 = getToken(br, lex);
-		if( T2 != ID ){
-			cerr << "Error : invalid set statement at line " << currLine  << "." << endl;
-			cerr << "\tA set statement must follow the pattern \"SET ID Expr;\"" << endl;
-			pushbackToken(T2, lex);
+		Token T3;
+		string id;
+		T3 = getToken(br, id);
+		if( T3 != ID ){
+			cerr << currLine  << ": Expected identifier" << endl;
+			pushbackToken(T3, lex);
 			return 0;
 		}
-		else{
-			setIDs[lex] = 1;
-			return new PTreeSet( Expr(br), lex);
+		setIDs[id] = 1;
+		
+		PTree *expr = Expr(br);
+		if( expr == 0 ) {
+			cerr << currLine << ": Expected an expression" << endl;
+			return 0;
 		}
+
+		Token T4;
+		T4 = getToken(br, lex);
+		if( T4 != SC ) {
+			cerr << currLine << ": Missing semicolon" << endl;
+			return 0;
+		}
+		return new PTreeSet( expr, id );
 	}
 	else if( T == DONE )
 		return 0;
 	else{
-		//cerr << currLine << ": not a valid statement" << endl;
+		cerr << currLine << ": not a valid statement" << endl;
 		return 0;
 	}
 }
@@ -503,23 +563,20 @@ int main( int argc, char *argv[] ){
 		return 1;
 	}
 	
-	if(debug){
-		cout << "test" << endl;
-		PTree *v1 = new PTreeINT(3);
-		PTree *v2 = new PTreeSTRING("help");
-		Value *a = v1->eval();
-		Value *b = v2->eval();
-		cout << a << ":" << b << endl;
-		cout << "/test" << endl;
-	}
-
 	PTree *program;
 	program = Program(br);
+
 	if( !program || errcnt )
 		return 0;
-    
-	// do all semantic checks... then...
 
+	// do all semantic checks... then...
+	if(debug){
+		cout << numNodes << " nodes" << endl;
+		map<string, int> varsSet;
+		if( program->checkSetFirst(varsSet) ){
+			cout << "Leaf Count: " << program->leafCount() << endl;
+		}
+	}
 	Value *val = program->eval();
 	delete val;
 
