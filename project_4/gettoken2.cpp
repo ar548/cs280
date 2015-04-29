@@ -1,10 +1,3 @@
-//  gettoken.cpp
-//  p2lexer
-//
-//  Created by Gerard Ryan on 2/26/15.
-//  Copyright (c) 2015 Gerard Ryan. All rights reserved.
-//
-
 #include "p2lex.h"
 #include <cctype>
 
@@ -89,6 +82,7 @@ getToken(istream *br, string& lexeme)
                 }
                 else if (inchar == '"') {
                     state = INSTRING;
+		    lexeme = "";
                 }
                 else if (isdigit(inchar)) {
                     state = ININT;
@@ -122,12 +116,13 @@ getToken(istream *br, string& lexeme)
                 break;
                 
             case INSTRING:
-                lexeme += inchar;
+                //lexeme += inchar;
                 if (inchar == '\n') {
                     return DONE;
                 }
                 if (inchar != '"') {
-                    continue;
+		    lexeme += inchar;
+		    continue;
                 }
                 
                 return STRING;

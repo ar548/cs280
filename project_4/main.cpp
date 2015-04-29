@@ -6,15 +6,10 @@
 
 using namespace Values;
 
-// ...
-
-// this is a global map used to keep values that are assigned to variables
-// the key is the identifier
 map<string,Value*> variables;
 map<string, int> setIDs;
 int errcnt = 0;
 extern int currLine;
-bool debug = false;
 
 int numNodes = 0;
 
@@ -76,8 +71,17 @@ public:
 	PTreePrint(PTree *expr) : PTree(expr) {}
 
 	Value *eval() {
-		Value *vprint = left->eval();
-		cout << vprint << endl;
+		Value *vprint;
+		vprint = left->eval();
+		if( vprint->hasStr() ){
+			cout << "\"" << vprint->getSValue() << "\"" << endl;
+		}
+		else if( vprint->hasInt() ){
+			cout << vprint->getIValue() << endl;
+		}
+		else{
+			cout << "invalid print expression" << endl;
+		}
 		delete vprint;
 		return new Value();
 	}
@@ -116,12 +120,8 @@ public:
 		}
 		else{
 			variables[id] = v;
-			if(debug){
-				cout << "setting " << id << " to " << v << endl;
-			}
 		}
 
-		delete v;
 		return new Value();
 	}
 };
@@ -252,7 +252,7 @@ public:
 			
 			ans = new ValueString(a);
 		}
-		else if( l->getType() == T_INT && r->getType() == T_STRING ){
+		else if( l->getType() == T_STRING && r->getType() == T_INT ){
 			int n = r->getIValue();
 			string s1 = l->getSValue();
 			string a = "";
@@ -321,10 +321,10 @@ public:
 			
 			if( n > s.length() )
 				ans = new ValueString(s);
-			else if( n > 0 )
+			else if( n < 0 )
 				ans = new ValueString("");
 			else
-				ans = new ValueString( s.substr(0, s.length()-n) );
+				ans = new ValueString( s.substr(0, n) );
 		}
 		delete l;
 		delete r;
@@ -416,7 +416,7 @@ PTree *Stmt(istream *br){
 		// the statement is a print statement
 		PTree *expr = Expr(br);
 		if( expr == 0 ) {
-			cerr << currLine << ": Expected an expression" << endl;
+			cerr << "Type error in print expression" << endl;
 			return 0;
 		}
 		
@@ -535,8 +535,9 @@ PTree *Primary(istream *br){
 		return new PTreeSTRING(lex);
 	}
 	else {
-		cerr << currLine << ": invlaid primary" << endl;
+		cerr << currLine << ": Invalid primary" << endl;
 		pushbackToken(t, lex);
+		exit(1);
 		return 0;
 	}
 }
@@ -569,16 +570,10 @@ int main( int argc, char *argv[] ){
 	if( !program || errcnt )
 		return 0;
 
-	// do all semantic checks... then...
-	if(debug){
-		cout << numNodes << " nodes" << endl;
-		map<string, int> varsSet;
-		if( program->checkSetFirst(varsSet) ){
-			cout << "Leaf Count: " << program->leafCount() << endl;
-		}
+	if(program){
+		Value *val = program->eval();
+		delete val;
 	}
-	Value *val = program->eval();
-	delete val;
 
 	return 0;
 }
